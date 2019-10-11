@@ -3,6 +3,7 @@ require(annotables)
 require(grImport)
 require(BuenColors)
 require(cowplot)
+require(edgeR)
 
 # 
 blood_cell_plot <- function(genes, palette = "solar_rojos", output_dir = ".",
