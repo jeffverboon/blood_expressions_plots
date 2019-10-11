@@ -5,7 +5,7 @@ require(BuenColors)
 require(cowplot)
 
 # 
-blood_cell_plot <- function(genes, palette = "solar_rojos", output_dir,
+blood_cell_plot <- function(genes, palette = "solar_rojos", output_dir = ".",
                             type = "log2_cpm" ){
    myshape<- readPicture("./data/blank_cells.eps.xml")
    genes = genes
