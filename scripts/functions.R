@@ -14,8 +14,8 @@ blood_cell_plot <- function(genes, palette = "solar_rojos", output_dir = ".",
    df <- import_data(type = type)
    df <- anno_grch38(df)
    df <- filter_genes_long(df, genes)
-   df <- generate_plot_info(df, palette, n)[[1]] %>% distinct()
-   legend <- generate_plot_info(df, palette, n)[[2]]
+   df <- generate_plot_info(df, palette, n, type = type)[[1]] %>% distinct()
+   legend <- generate_plot_info(df, palette, n, type = type)[[2]]
    for(symb in unique(df$symbol)){
       curr <- df %>% filter(symbol == symb)
       my_shape <- color_cells(myshape, curr) %>% pictureGrob(.) %>% ggdraw(.)
@@ -28,7 +28,7 @@ blood_cell_plot <- function(genes, palette = "solar_rojos", output_dir = ".",
 
 
 # generate color graphic information using ggplot
-generate_plot_info <- function(df, palette, n_genes){
+generate_plot_info <- function(df, palette, n_genes, type){
    palette = jdb_palette(palette)
    df <- data.frame(df)
    if(n_genes == 1){
@@ -45,6 +45,14 @@ generate_plot_info <- function(df, palette, n_genes){
          pretty_plot() + 
          scale_fill_gradientn(colors = palette)
    }
+   if(type == "cpm"){
+      p1 <- p1 + labs(fill = "cpm")
+   }else if(type == "log2_cpm"){
+      p1 <- p1 + labs(fill = "log2(cpm + 1)")
+   }else if(type == "raw"){
+      p1 <- p1 + labs(fill = "counts")
+   }
+   
    df <- ggplot_build(p1)[[1]] %>%
       data.frame(.) %>% 
       dplyr::select(1,3) %>%
@@ -56,7 +64,7 @@ generate_plot_info <- function(df, palette, n_genes){
 
 # import data
 import_data <- function(type){
-   df <- readRDS("./data/counts.rds")
+   df <- read_tsv("https://raw.githubusercontent.com/jeffverboon/blood_expressions_plots/master/data/counts.tsv")
    if(type == "log2_cpm" || type == "cpm"){
       df[-1] <- lapply(df[-1], cpm)
       if(type == "log2_cpm"){
@@ -79,6 +87,7 @@ filter_genes_long <- function(df, genes){
       df %>% 
       filter(symbol %in% genes | ensg %in% genes) %>%
       gather(cell_type, expression, -ensg, -symbol)
+   if()
 }
 
 
@@ -215,4 +224,5 @@ color_cells <- function(picture, df){
    my_shape@paths[223]$path@rgb <- PLT
    my_shape@paths[225]$path@rgb <- PLT
    return(my_shape)
-}
+}   
+   
